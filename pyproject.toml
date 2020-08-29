@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "tp1"
+name = "inkscape-gtk"
 version = "0.1.0"
 description = ""
-authors = ["lautaro bringasq <lm.bringas98@gmail.com>"]
+authors = ["lautaro bringas <lm.bringas98@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.7"
