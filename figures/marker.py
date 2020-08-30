@@ -47,7 +47,7 @@ class Marker:
     def button_released(self, src, tgt, event):
         self.position = None
 
-    def moveto(self, x, y):
+    def move_to(self, x, y):
         self.marker.set_property("center-x", x)
         self.marker.set_property("center-y", y)
 
@@ -61,8 +61,48 @@ class Marker:
         new_x = self.marker.get_property("center-x") + dx
         new_y = self.marker.get_property("center-y") + dy
 
-        self.moveto(new_x, new_y)
+        self.move_to(new_x, new_y)
 
         self.position = new_x, new_y
         if self.callback is not None:
             self.callback(new_x, new_y)
+
+    def remove(self):
+        self.marker.remove()
+
+
+class PointerMarker:
+    def __init__(
+        self,
+        layer,
+        x,
+        y,
+        radius=DEFAULT_MARKER_RADIUS,
+        color=DEFAULT_MARKER_COLOR,
+        callback=None,
+    ):
+        self.x, self.y = x, y
+        self.radius = radius
+        self.color = color
+        self.callback = callback
+
+        self.marker = GooCanvas.CanvasEllipse(
+            parent=layer,
+            center_x=x,
+            center_y=y,
+            radius_x=radius,
+            radius_y=radius,
+            stroke_color=color,
+            fill_color_rgba=0xFFFFFF20,
+            line_width=2,
+        )
+
+        self.marker.connect("button-press-event", self.button_pressed)
+
+    def button_pressed(self, src, tgt, event):
+        if self.callback is not None:
+            self.callback()
+        return True
+
+    def remove(self):
+        self.marker.remove()

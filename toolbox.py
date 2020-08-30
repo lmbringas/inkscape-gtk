@@ -7,16 +7,17 @@ from figures import Rectangle, SimpleLine
 from figures.utils import make_rgba
 
 
-DEFAULT_STROKE_COLOR = make_rgba("yellow")
-DEFAULT_FILL_COLOR = make_rgba("green", 0.5)
+DEFAULT_STROKE_COLOR = make_rgba("cyan")
+DEFAULT_FILL_COLOR = make_rgba("khaki", 0.5)
 
 
 class Toolbox(Gtk.Frame):
     def __init__(self, layer):
         super(Toolbox, self).__init__(label="Herramientas", margin=6)
         self.layer = layer
-        self.layer.connect("button-press-event", self.layer_click)
+        self.layer_click_id = self.layer.connect("button-press-event", self.layer_click)
         self.figure = None
+        self.figures = []
 
         vbox = Gtk.VBox(margin=6)
         self.add(vbox)
@@ -58,10 +59,23 @@ class Toolbox(Gtk.Frame):
             btn.connect("clicked", self.figure_selected, figure)
             vbox.pack_start(btn, False, False, 0)
 
+        clear_button = Gtk.Button.new_with_label("Limpiar")
+        clear_button.connect("clicked", self.clear)
+        vbox.pack_end(clear_button, False, False, 0)
+
+    def reconnect_layer_click(self):
+        self.layer_click_id = self.layer.connect('button-press-event', self.layer_click)
+
     def figure_selected(self, btn, which):
         self.figure = which
 
     def layer_click(self, src, tgt, event):
         if self.figure is not None:
             # self.figure contiene al objeto a instanciar - lo hacemos aqui.
-            self.figure(self, event.x, event.y)
+            self.figures.append(self.figure(self, event.x, event.y))
+
+    def clear(self, btn):
+        if self.figures:
+            for figure in self.figures:
+                figure.remove()
+            self.figures.clear()
