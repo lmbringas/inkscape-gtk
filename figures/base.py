@@ -135,7 +135,8 @@ class SimpleLine(Figure):
             self.tbox.layer, x, y, color='grey', callback=self.close_polyline
         )
 
-    def close_polyline(self):
+    def close_polyline(self, x, y):
+        self.polyline_points.move_current(x, y)
         self.tbox.reconnect_layer_click()
         self.disconnect_events()
         self.remove_markers()
@@ -177,7 +178,7 @@ class SimpleLine(Figure):
     def canvas_clicked(self, src, tgt, event):
         # if the event was triggred with a right-click
         if event.button == 3:
-            self.close_polyline()
+            self.close_polyline(event.x, event.y)
             self.polyline_points.remove_current()
             return
 

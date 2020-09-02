@@ -101,7 +101,7 @@ class PointerMarker:
 
     def button_pressed(self, src, tgt, event):
         if self.callback is not None:
-            self.callback()
+            self.callback(self.x, self.y)
         return True
 
     def remove(self):
