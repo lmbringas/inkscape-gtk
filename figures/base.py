@@ -12,7 +12,6 @@ from typing import List, Tuple
 
 class Figure:
     ''''''
-
     def __init__(self, tbox):
         """Tarea comun: Buscar colores, y ancho del trazo actualmente
         seleccionados.
@@ -121,11 +120,11 @@ class SimpleLine(Figure):
         self.tbox.layer.disconnect(self.tbox.layer_click_id)
         self.set_origin(x, y)
         self.closing_markers = [self.build_closing_marker(x, y)]
-
         self.connect_events()
 
         self.instance = GooCanvas.CanvasPolyline(
             parent=self.tbox.layer,
+            fill_color_rgba=self.fill_color,
             stroke_color_rgba=self.stroke_color,
             line_width=self.line_width,
         )
@@ -176,14 +175,15 @@ class SimpleLine(Figure):
         self.tbox.layer.disconnect(self.id_motion)
 
     def canvas_clicked(self, src, tgt, event):
+        # if the event was triggred with a right-click
+        if event.button == 3:
+            self.close_polyline()
+            self.polyline_points.remove_current()
+            return
 
         self.polyline_points.move_current(event.x, event.y)
         self.polyline_points.add(event.x, event.y)
         self.closing_markers.append(self.build_closing_marker(event.x, event.y))
-
-        # if the event was triggred with a right-click
-        if event.button == 3:
-            self.close_polyline()
 
     def pointer_moved(self, src, tgt, event):
         self.polyline_points.move_current(event.x, event.y)
@@ -208,6 +208,10 @@ class PolylinePoints:
 
     def add(self, x, y):
         self.points.append((x, y))
+        self.build_canvas_points()
+
+    def remove_current(self):
+        self.points.pop()
         self.build_canvas_points()
 
     def move_current(self, x, y):
